@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscador de Países</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f2f2f2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    #searchContainer {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    input[type="text"], select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 250px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #resultado {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .panel {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      flex: 1 1 45%;
+      min-width: 300px;
+    }
+
+    .pais img {
+      margin-top: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 800px) {
+      #resultado {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Buscador de Países (Inglés)</h1>
+
+  <div id="searchContainer">
+    <input type="text" id="paisInput" placeholder="Escribe un país">
+    <button onclick="buscarPais()">Buscar</button>
+
+    <select id="conti" onchange="buscarPorRegion()">
+      <option value="">Selecciona una región</option>
+      <option value="Americas">Americas</option>
+      <option value="Europe">Europe</option>
+      <option value="Asia">Asia</option>
+      <option value="Oceania">Oceania</option>
+      <option value="Africa">Africa</option>
+    </select>
+  </div>
+
+  <div id="resultado"></div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    function buscarPais() {
+      const pais = document.getElementById('paisInput').value.trim().toLowerCase();
+      if (!pais) return;
+
+      const url = `https://restcountries.com/v3.1/name/${pais}`;
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = '<div class="loader"></div>';
+
+      fetch(url)
+        .then(res => {
+          if (!res.ok) throw new Error("País no encontrado");
+          return res.json();
+        })
+        .then(data => {
+          const country = data[0];
+          mostrarPaisYLimitrofes(country);
+        })
+        .catch(error => {
+          resultado.innerHTML = `<p style="color:red;"><strong>Error:</strong> ${error.message}</p>`;
+        });
+    }
+
+    function buscarPorRegion() {
+      const region = document.getElementById('conti').value;
+      const resultado = document.getElementById('resultado');
+      if (!region) return;
+
+      resultado.innerHTML = '<div class="loader"></div>';
+
+      fetch(`https://restcountries.com/v3.1/region/${region}`)
+        .then(res => res.json())
+        .then(data => {
+          resultado.innerHTML = '';
+          data.forEach(pais => {
+            const div = document.createElement('div');
+            div.classList.add('panel');
+            div.innerHTML = `
+              <h2>${pais.name.common}</h2>
+              <p><strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}</p>
+              <p><strong>Población:</strong> ${pais.population.toLocaleString()}</p>
+              <p><strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}</p>
+              <img src="${pais.flags.png}" alt="Bandera de ${pais.name.common}" width="120">
+            `;
+            resultado.appendChild(div);
+          });
+        })
+        .catch(err => {
+          resultado.innerHTML = `<p style="color:red;"><strong>Error:</strong> ${err.message}</p>`;
+        });
+    }
+
+    async function mostrarPaisYLimitrofes(country) {
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = '';
+
+      // Panel principal del país
+      const panelPais = document.createElement('div');
+      panelPais.classList.add('panel');
+      const nombre = country.name.common;
+      const capital = country.capital?.[0] || 'No disponible';
+      const region = country.region;
+      const poblacion = country.population.toLocaleString();
+      const idiomas = Object.values(country.languages || {}).join(', ');
+      const bandera = country.flags.png;
+
+      panelPais.innerHTML = `
+        <h2>${nombre}</h2>
+        <p><strong>Capital:</strong> ${capital}</p>
+        <p><strong>Región:</strong> ${region}</p>
+        <p><strong>Población:</strong> ${poblacion}</p>
+        <p><strong>Idiomas:</strong> ${idiomas}</p>
+        <img src="${bandera}" alt="Bandera de ${nombre}" width="150">
+        <div id="map" style="height: 300px; margin-top:10px;"></div>
+      `;
+
+      resultado.appendChild(panelPais);
+
+      // Inicializar mapa
+      const lat = country.latlng[0];
+      const lon = country.latlng[1];
+      const map = L.map('map').setView([lat, lon], 5);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+      L.marker([lat, lon]).addTo(map)
+        .bindPopup(`<b>${nombre}</b><br>Capital: ${capital}`)
+        .openPopup();
+
+      // Panel de países limítrofes
+      const panelLimitrofes = document.createElement('div');
+      panelLimitrofes.classList.add('panel');
+      panelLimitrofes.innerHTML = `<h3>Países limítrofes</h3>`;
+      resultado.appendChild(panelLimitrofes);
+
+      if (!country.borders || country.borders.length === 0) {
+        panelLimitrofes.innerHTML += `<p>No tiene países limítrofes.</p>`;
+        return;
+      }
+
+      // Traer info de países limítrofes
+      const codes = country.borders.join(',');
+      try {
+        const res = await fetch(`https://restcountries.com/v3.1/alpha?codes=${codes}`);
+        const vecinos = await res.json();
+        vecinos.forEach(p => {
+          const div = document.createElement('div');
+          div.classList.add('pais');
+          div.innerHTML = `
+            <h4>${p.name.common}</h4>
+            <p><strong>Capital:</strong> ${p.capital?.[0] || 'No disponible'}</p>
+            <p><strong>Población:</strong> ${p.population.toLocaleString()}</p>
+            <img src="${p.flags.png}" alt="Bandera de ${p.name.common}" width="80">
+          `;
+          panelLimitrofes.appendChild(div);
+        });
+      } catch(err) {
+        panelLimitrofes.innerHTML += `<p>Error al cargar países limítrofes.</p>`;
+      }
+    }
+
+    // Permitir presionar Enter para buscar
+    document.getElementById('paisInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') buscarPais();
+    });
+  </script>
+</body>
+</html>
