@@ -2,77 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Buscador de Países</title>
+  <title>Buscador de Países</title> <!-- Título de pestaña -->
+
+  <!-- CSS de Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- CSS del API de los mapas (Leaflet) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f2f2f2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 20px;
-    }
-
-    #searchContainer {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    input[type="text"], select {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      width: 250px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #007bff;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #resultado {
-      width: 100%;
-      max-width: 1000px;
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .panel {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      flex: 1 1 45%;
-      min-width: 300px;
-    }
-
-    .pais img {
-      margin-top: 10px;
-      border: 1px solid #ccc;
-    }
-
+    /* carga */
     .loader {
       border: 6px solid #f3f3f3;
       border-top: 6px solid #007bff;
@@ -84,25 +23,25 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @media (max-width: 800px) {
-      #resultado {
-        flex-direction: column;
-      }
+      0% { transform: rotate(0deg); } /* Inicio de la rotación */
+      100% { transform: rotate(360deg); } /* Fin (una vuelta completa) */
     }
   </style>
 </head>
-<body>
-  <h1>Buscador de Países (Inglés)</h1>
 
-  <div id="searchContainer">
-    <input type="text" id="paisInput" placeholder="Escribe un país">
-    <button onclick="buscarPais()">Buscar</button>
+<body class="bg-light text-center">
+  <h1 class="my-4 text-primary">Buscador de Países (Inglés)</h1> <!-- Título -->
 
-    <select id="conti" onchange="buscarPorRegion()">
+  <!-- Contenedor principal de búsqueda -->
+  <div id="searchContainer" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
+    <!-- Input para escribir el nombre del país -->
+    <input type="text" id="paisInput" placeholder="Escribe un país" class="form-control w-auto">
+
+    <!-- Botón que ejecuta la función buscarPais()  -->
+    <button class="btn btn-primary" onclick="buscarPais()">Buscar</button>
+
+    <!-- Select para filtrar países por región -->
+    <select id="conti" class="form-select w-auto" onchange="buscarPorRegion()">
       <option value="">Selecciona una región</option>
       <option value="Americas">Americas</option>
       <option value="Europe">Europe</option>
@@ -112,68 +51,84 @@
     </select>
   </div>
 
-  <div id="resultado"></div>
+  <!-- Contenedor donde se mostrará el resultado -->
+  <div id="resultado" class="d-flex flex-wrap justify-content-center gap-3"></div>
 
+  <!-- Script del API de mapas (Leaflet) -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+  <!-- Script principal -->
   <script>
+    /* Función que busca un país por nombre */
     function buscarPais() {
       const pais = document.getElementById('paisInput').value.trim().toLowerCase();
+      // Si el campo está vacío, no hace nada
       if (!pais) return;
 
-      const url = `https://restcountries.com/v3.1/name/${pais}`;
+      const url = `https://restcountries.com/v3.1/name/${pais}`; // URL de la API
       const resultado = document.getElementById('resultado');
-      resultado.innerHTML = '<div class="loader"></div>';
+      resultado.innerHTML = '<div class="loader"></div>'; // Muestra animación de carga
 
+      // Petición a la API
       fetch(url)
         .then(res => {
-          if (!res.ok) throw new Error("País no encontrado");
+          if (!res.ok) throw new Error("País no encontrado"); // Manejo de errores
           return res.json();
         })
         .then(data => {
-          const country = data[0];
-          mostrarPaisYLimitrofes(country);
+          const country = data[0]; // Primer país del array 
+          mostrarPaisYLimitrofes(country); // Muestra información completa
         })
         .catch(error => {
-          resultado.innerHTML = `<p style="color:red;"><strong>Error:</strong> ${error.message}</p>`;
+          resultado.innerHTML = `<p class="text-danger fw-bold">Error: ${error.message}</p>`;
         });
     }
 
+    /* Función que busca países por región */
     function buscarPorRegion() {
       const region = document.getElementById('conti').value;
       const resultado = document.getElementById('resultado');
-      if (!region) return;
+      if (!region) return; // Si no se elige región, no hace nada
 
-      resultado.innerHTML = '<div class="loader"></div>';
+      resultado.innerHTML = '<div class="loader"></div>'; //  carga
 
+      // Llamada a la API de regiones
       fetch(`https://restcountries.com/v3.1/region/${region}`)
         .then(res => res.json())
         .then(data => {
-          resultado.innerHTML = '';
+          resultado.innerHTML = ''; // Limpia resultados anteriores
+          // Recorremos todos los paises 
           data.forEach(pais => {
-            const div = document.createElement('div');
-            div.classList.add('panel');
+            const div = document.createElement('div'); // Crea un contenedor
+            div.classList.add('card', 'p-3', 'shadow', 'border-0', 'text-start');
+
+            // Rellena el modal con datos del país
             div.innerHTML = `
-              <h2>${pais.name.common}</h2>
+              <h5 class="text-primary">${pais.name.common}</h5>
               <p><strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}</p>
               <p><strong>Población:</strong> ${pais.population.toLocaleString()}</p>
               <p><strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}</p>
-              <img src="${pais.flags.png}" alt="Bandera de ${pais.name.common}" width="120">
+              <img src="${pais.flags.png}" class="border rounded" alt="Bandera de ${pais.name.common}" width="120">
             `;
-            resultado.appendChild(div);
+            resultado.appendChild(div); // Agregamos el modal al contenedor principal
           });
         })
         .catch(err => {
-          resultado.innerHTML = `<p style="color:red;"><strong>Error:</strong> ${err.message}</p>`;
+          resultado.innerHTML = `<p class="text-danger fw-bold">Error: ${err.message}</p>`;
         });
     }
 
+    /* Función async que muestra un país y sus países limítrofes */
     async function mostrarPaisYLimitrofes(country) {
       const resultado = document.getElementById('resultado');
-      resultado.innerHTML = '';
+      resultado.innerHTML = ''; // Limpia resultados previos
 
-      // Panel principal del país
+      // Crea un modal principal del país
       const panelPais = document.createElement('div');
-      panelPais.classList.add('panel');
+      panelPais.classList.add('card', 'p-4', 'shadow', 'border-0', 'text-start');
+      panelPais.style.width = "45%";
+
+      // Datos del país 
       const nombre = country.name.common;
       const capital = country.capital?.[0] || 'No disponible';
       const region = country.region;
@@ -181,22 +136,22 @@
       const idiomas = Object.values(country.languages || {}).join(', ');
       const bandera = country.flags.png;
 
+      // Estructura del país 
       panelPais.innerHTML = `
-        <h2>${nombre}</h2>
+        <h4 class="text-primary">${nombre}</h4>
         <p><strong>Capital:</strong> ${capital}</p>
         <p><strong>Región:</strong> ${region}</p>
         <p><strong>Población:</strong> ${poblacion}</p>
         <p><strong>Idiomas:</strong> ${idiomas}</p>
-        <img src="${bandera}" alt="Bandera de ${nombre}" width="150">
-        <div id="map" style="height: 300px; margin-top:10px;"></div>
+        <img src="${bandera}" alt="Bandera de ${nombre}" class="border rounded mb-2" width="150">
+        <div id="map" style="height: 300px; border-radius: 8px;"></div>
       `;
-
       resultado.appendChild(panelPais);
 
-      // Inicializar mapa
+      // Inicia mapa (Leaflet)
       const lat = country.latlng[0];
       const lon = country.latlng[1];
-      const map = L.map('map').setView([lat, lon], 5);
+      const map = L.map('map').setView([lat, lon], 5); // Centra en el país
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
@@ -204,30 +159,33 @@
         .bindPopup(`<b>${nombre}</b><br>Capital: ${capital}`)
         .openPopup();
 
-      // Panel de países limítrofes
+      // Panel para mostrar los países limítrofes
       const panelLimitrofes = document.createElement('div');
-      panelLimitrofes.classList.add('panel');
-      panelLimitrofes.innerHTML = `<h3>Países limítrofes</h3>`;
+      panelLimitrofes.classList.add('card', 'p-4', 'shadow', 'border-0', 'text-start');
+      panelLimitrofes.style.width = "45%";
+      panelLimitrofes.innerHTML = `<h5 class="text-success">Países limítrofes</h5>`;
       resultado.appendChild(panelLimitrofes);
 
+      // Verificamos si el país tiene fronteras
       if (!country.borders || country.borders.length === 0) {
         panelLimitrofes.innerHTML += `<p>No tiene países limítrofes.</p>`;
         return;
       }
 
-      // Traer info de países limítrofes
+      // obtiene su códigos
       const codes = country.borders.join(',');
       try {
         const res = await fetch(`https://restcountries.com/v3.1/alpha?codes=${codes}`);
         const vecinos = await res.json();
+        // Mostramos la info de los vecinos
         vecinos.forEach(p => {
           const div = document.createElement('div');
-          div.classList.add('pais');
+          div.classList.add('border-bottom', 'pb-2', 'mb-2');
           div.innerHTML = `
-            <h4>${p.name.common}</h4>
+            <h6 class="text-secondary">${p.name.common}</h6>
             <p><strong>Capital:</strong> ${p.capital?.[0] || 'No disponible'}</p>
             <p><strong>Población:</strong> ${p.population.toLocaleString()}</p>
-            <img src="${p.flags.png}" alt="Bandera de ${p.name.common}" width="80">
+            <img src="${p.flags.png}" alt="Bandera de ${p.name.common}" width="80" class="border rounded">
           `;
           panelLimitrofes.appendChild(div);
         });
@@ -236,10 +194,12 @@
       }
     }
 
-    // Permitir presionar Enter para buscar
+    // Permite buscar al presionar Enter
     document.getElementById('paisInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') buscarPais();
     });
   </script>
 </body>
 </html>
+
+
