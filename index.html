@@ -21,7 +21,7 @@
       animation: spin 1s linear infinite;
       margin: 20px auto;
     }
-/* rotacion de cargar*/
+    /* rotacion de cargar*/
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -29,7 +29,6 @@
 
     /* Tarjetas de países */
     .country-card {
-      width: 260px;
       border-radius: 15px;
       background-color: #ffffff;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -69,25 +68,34 @@
 </head>
 
 <body class="bg-light text-center">
-  <h1 class="my-4 text-primary">Buscador de Países (Inglés)</h1>
+  <div class="container py-4">
+    <h1 class="my-4 text-primary">Buscador de Países (Inglés)</h1>
 
-  <!-- búsqueda -->
-  <div id="searchContainer" class="d-flex justify-content-center flex-wrap gap-3 mb-4">
-    <input type="text" id="paisInput" placeholder="Escribe un país" class="form-control w-auto">
-    <button class="btn btn-primary" onclick="buscarPais()">Buscar</button>
-    <select id="conti" class="form-select w-auto" onchange="buscarPorRegion()">
-      <option value="">Selecciona una región</option>
-      <option value="Americas">Americas</option>
-      <option value="Europe">Europe</option>
-      <option value="Asia">Asia</option>
-      <option value="Oceania">Oceania</option>
-      <option value="Africa">Africa</option>
-    </select>
+    <!-- búsqueda -->
+    <div id="searchContainer" class="row g-3 justify-content-center align-items-center mb-4">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <input type="text" id="paisInput" placeholder="Escribe un país" class="form-control">
+      </div>
+      <div class="col-12 col-sm-6 col-md-3 col-lg-2">
+        <button class="btn btn-primary w-100" onclick="buscarPais()">Buscar</button>
+      </div>
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <select id="conti" class="form-select" onchange="buscarPorRegion()">
+          <option value="">Selecciona una región</option>
+          <option value="Americas">Americas</option>
+          <option value="Europe">Europe</option>
+          <option value="Asia">Asia</option>
+          <option value="Oceania">Oceania</option>
+          <option value="Africa">Africa</option>
+        </select>
+      </div>
+    </div>
+
+    <h2><a href="juego.html">juego</a></h2>
+
+    <!-- Contenedor donde se ve el resultado -->
+    <div id="resultado" class="row justify-content-center g-4"></div>
   </div>
- <h2> <a href="juego.html">juego </a></h2>
-
-  <!-- Contenedor donde se ve el resultado -->
-  <div id="resultado" class="d-flex flex-wrap justify-content-center gap-3"></div>
 
   <!-- Script del API de mapas (Leaflet) -->
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -130,15 +138,17 @@
           resultado.innerHTML = '';
           data.forEach(pais => {
             const div = document.createElement('div');
-            div.classList.add('country-card');
+            div.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3');
 
             div.innerHTML = `
-              <img src="${pais.flags.png}" alt="Bandera de ${pais.name.common}" class="country-flag">
-              <div class="country-info">
-                <div class="country-name">${pais.name.common}</div>
-                <div class="country-detail"><strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}</div>
-                <div class="country-detail"><strong>Población:</strong> ${pais.population.toLocaleString()}</div>
-                <div class="country-detail"><strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}</div>
+              <div class="country-card h-100">
+                <img src="${pais.flags.png}" alt="Bandera de ${pais.name.common}" class="country-flag">
+                <div class="country-info">
+                  <div class="country-name">${pais.name.common}</div>
+                  <div class="country-detail"><strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}</div>
+                  <div class="country-detail"><strong>Población:</strong> ${pais.population.toLocaleString()}</div>
+                  <div class="country-detail"><strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}</div>
+                </div>
               </div>
             `;
             resultado.appendChild(div);
@@ -155,24 +165,17 @@
       resultado.innerHTML = '';
 
       const panelPais = document.createElement('div');
-      panelPais.classList.add('card', 'p-4', 'shadow', 'border-0', 'text-start');
-      panelPais.style.width = "45%";
-
-      const nombre = country.name.common;
-      const capital = country.capital?.[0] || 'No disponible';
-      const region = country.region;
-      const poblacion = country.population.toLocaleString();
-      const idiomas = Object.values(country.languages || {}).join(', ');
-      const bandera = country.flags.png;
-
+      panelPais.classList.add('col-12', 'col-lg-6');
       panelPais.innerHTML = `
-        <h4 class="text-primary">${nombre}</h4>
-        <p><strong>Capital:</strong> ${capital}</p>
-        <p><strong>Región:</strong> ${region}</p>
-        <p><strong>Población:</strong> ${poblacion}</p>
-        <p><strong>Idiomas:</strong> ${idiomas}</p>
-        <img src="${bandera}" alt="Bandera de ${nombre}" class="border rounded mb-2" width="150">
-        <div id="map" style="height: 300px; border-radius: 8px;"></div>
+        <div class="card p-4 shadow border-0 text-start h-100">
+          <h4 class="text-primary">${country.name.common}</h4>
+          <p><strong>Capital:</strong> ${country.capital?.[0] || 'No disponible'}</p>
+          <p><strong>Región:</strong> ${country.region}</p>
+          <p><strong>Población:</strong> ${country.population.toLocaleString()}</p>
+          <p><strong>Idiomas:</strong> ${Object.values(country.languages || {}).join(', ')}</p>
+          <img src="${country.flags.png}" alt="Bandera de ${country.name.common}" class="border rounded mb-2" width="150">
+          <div id="map" style="height: 300px; border-radius: 8px;"></div>
+        </div>
       `;
       resultado.appendChild(panelPais);
 
@@ -183,17 +186,22 @@
         attribution: '&copy; OpenStreetMap contributors'
       }).addTo(map);
       L.marker([lat, lon]).addTo(map)
-        .bindPopup(`<b>${nombre}</b><br>Capital: ${capital}`)
+        .bindPopup(`<b>${country.name.common}</b><br>Capital: ${country.capital?.[0] || 'No disponible'}`)
         .openPopup();
 
       const panelLimitrofes = document.createElement('div');
-      panelLimitrofes.classList.add('card', 'p-4', 'shadow', 'border-0', 'text-start');
-      panelLimitrofes.style.width = "45%";
-      panelLimitrofes.innerHTML = `<h5 class="text-success">Países limítrofes</h5>`;
+      panelLimitrofes.classList.add('col-12', 'col-lg-6');
+      panelLimitrofes.innerHTML = `
+        <div class="card p-4 shadow border-0 text-start h-100">
+          <h5 class="text-success">Países limítrofes</h5>
+        </div>
+      `;
       resultado.appendChild(panelLimitrofes);
 
+      const contenedorLimitrofes = panelLimitrofes.querySelector('.card');
+
       if (!country.borders || country.borders.length === 0) {
-        panelLimitrofes.innerHTML += `<p>No tiene países limítrofes.</p>`;
+        contenedorLimitrofes.innerHTML += `<p>No tiene países limítrofes.</p>`;
         return;
       }
 
@@ -202,18 +210,17 @@
         const res = await fetch(`https://restcountries.com/v3.1/alpha?codes=${codes}`);
         const vecinos = await res.json();
         vecinos.forEach(p => {
-          const div = document.createElement('div');
-          div.classList.add('border-bottom', 'pb-2', 'mb-2');
-          div.innerHTML = `
-            <h6 class="text-secondary">${p.name.common}</h6>
-            <p><strong>Capital:</strong> ${p.capital?.[0] || 'No disponible'}</p>
-            <p><strong>Población:</strong> ${p.population.toLocaleString()}</p>
-            <img src="${p.flags.png}" alt="Bandera de ${p.name.common}" width="80" class="border rounded">
+          contenedorLimitrofes.innerHTML += `
+            <div class="border-bottom pb-2 mb-2">
+              <h6 class="text-secondary">${p.name.common}</h6>
+              <p><strong>Capital:</strong> ${p.capital?.[0] || 'No disponible'}</p>
+              <p><strong>Población:</strong> ${p.population.toLocaleString()}</p>
+              <img src="${p.flags.png}" alt="Bandera de ${p.name.common}" width="80" class="border rounded">
+            </div>
           `;
-          panelLimitrofes.appendChild(div);
         });
       } catch(err) {
-        panelLimitrofes.innerHTML += `<p>Error al cargar países limítrofes.</p>`;
+        contenedorLimitrofes.innerHTML += `<p>Error al cargar países limítrofes.</p>`;
       }
     }
 
@@ -223,5 +230,3 @@
   </script>
 </body>
 </html>
-
-
