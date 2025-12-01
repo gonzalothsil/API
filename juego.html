@@ -12,56 +12,35 @@
 
   <h1 class="mb-4 text-primary fw-bold">Adivina el País por su Capital</h1>
 
-  <!-- Contenedor principal del juego -->
-  <div class="game-card">
+    <div class="game-card">
 
-    <!-- donde se muestra la capital -->
-    <p id="capital" class="capital">Cargando...</p>
+      <p id="capital" class="capital">Cargando...</p>
 
-    <!--botones de opciones -->
     <div id="options" class="d-grid gap-2"></div>
 
-    <!-- Mensaje de respuesta (correcto/incorrecto) -->
     <p id="feedback" class="feedback"></p>
 
-    <!-- Botón para siguiente pregunta -->
     <button id="nextBtn" class="btn btn-success btn-next" onclick="nuevaPregunta()">Siguiente ➡️</button>
   </div>
 
   <a href="index.html" class="btn btn-outline-secondary mt-4">⬅️ Volver al Buscador</a>
 
 <script>
-
-  /* 
-    VARIABLES GLOBALES
-    paises  lista de todos los países obtenidos de la API
-    paisCorrecto  país que corresponde a la capital mostrada
-  */
-  let paises = [];
+let paises = [];
   let paisCorrecto = null;
 
 
-  /* 
-    FUNCIÓN cargarPaises()
-    Descarga los países desde la API RestCountries
-    Si falla, carga datos de respaldo 
-  */
   async function cargarPaises() {
     try {
-      // Se pide la API con solo "name" y "capital"
       const res = await fetch("https://restcountries.com/v3.1/all?fields=name,capital");
 
-      // Si no responde bien, usamos la lista de respaldo
       if (!res.ok) throw 0;
 
-      // Convertimos la respuesta a JSON
       const data = await res.json();
 
-      // Guardamos solo países que tienen capital
       paises = data.filter(p => p.capital);
     } catch {
 
-      // Lista de reepaldo si no hay internet
       paises = [
         { name: { common: "Argentina" }, capital: ["Buenos Aires"] },
         { name: { common: "Francia" }, capital: ["París"] },
@@ -70,44 +49,27 @@
       ];
     }
 
-    // Empieza el juego con la primera pregunta
     nuevaPregunta();
   }
 
-
-  /* 
-    FUNCIÓN nuevaPregunta()
-    Genera una capital aleatoria y muestra 4 opciones
-  */
   function nuevaPregunta() {
 
-    // Limpio el mensaje de feedback
     feedback.textContent = "";
+        nextBtn.style.display = "none";
+paisCorrecto = paises[Math.random() * paises.length | 0];
 
-    // Oculto el botón "Siguiente"
-    nextBtn.style.display = "none";
-
-    // Elijo un país al azar como correcto
-    paisCorrecto = paises[Math.random() * paises.length | 0];
-
-    // Muestro la capital en pantalla
     capital.textContent = `¿De qué país es la capital "${paisCorrecto.capital[0]}"?`;
 
-    // Array con las opciones
     const opciones = [paisCorrecto];
 
-    // Agrego países random hasta tener 4 opciones
-    while (opciones.length < 4) {
+        while (opciones.length < 4) {
       let p = paises[Math.random() * paises.length | 0];
 
-      // Evitar repetidos
-      if (!opciones.includes(p)) opciones.push(p);
+        if (!opciones.includes(p)) opciones.push(p);
     }
 
-    // Mezclo al azar las 4 opciones
     opciones.sort(() => Math.random() - 0.5);
 
-    //  botones en el HTML
     options.innerHTML = opciones
       .map(p =>
         `<button class="btn btn-outline-primary btn-option" onclick="verificar('${p.name.common}')">${p.name.common}</button>`
@@ -115,33 +77,22 @@
       .join('');
   }
 
-
-  /* 
-    FUNCIÓN verificar(sel)
-    Recibe la respuesta elegida
-  */
   function verificar(sel) {
 
-    // Desactivo todos los botones para que no pulsen más
     document.querySelectorAll(".btn-option").forEach(b => b.disabled = true);
 
-    // Si acierta
     if (sel === paisCorrecto.name.common) {
       feedback.textContent = "✅ ¡Correcto!";
       feedback.className = "feedback text-success";
     }
 
-    // Si no acierta
     else {
       feedback.textContent = `❌ Incorrecto. Era ${paisCorrecto.name.common}`;
       feedback.className = "feedback text-danger";
     }
 
-    // Muestro botón "Siguiente"
     nextBtn.style.display = "block";
   }
-
-  // Llamo a la función al cargar la página
   cargarPaises();
 /*
 Bootstrap 5.3.3
@@ -172,5 +123,6 @@ autor:José Yedro
 
 </body>
 </html>
+
 
 
