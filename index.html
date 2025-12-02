@@ -171,23 +171,56 @@
     async function mostrarPaisYLimitrofes(country) {
 
       const resultado = document.getElementById('resultado');
-      resultado.innerHTML = ''; // Limpio pantalla
+      resultado.innerHTML = ''; 
 
 
       const panelPais = document.createElement('div');
       panelPais.classList.add('col-12', 'col-lg-6');
 
-      panelPais.innerHTML = `
-        <div class="card p-4 shadow border-0 text-start h-100">
-          <h4 class="text-primary">${country.name.common}</h4>
-          <p><strong>Capital:</strong> ${country.capital?.[0] || 'No disponible'}</p>
-          <p><strong>Región:</strong> ${country.region}</p>
-          <p><strong>Población:</strong> ${country.population.toLocaleString()}</p>
-          <p><strong>Idiomas:</strong> ${Object.values(country.languages || {}).join(', ')}</p>
-          <img src="${country.flags.png}" class="border rounded mb-2" width="150">
-          <div id="map" style="height: 300px; border-radius: 8px;"></div>
-        </div>
-      `;
+    
+const card = document.createElement('div');
+card.className = "card p-4 shadow border-0 text-start h-100";
+
+
+const titulo = document.createElement('h4');
+titulo.className = "text-primary";
+titulo.textContent = country.name.common;
+card.appendChild(titulo);
+
+const pCapital = document.createElement('p');
+pCapital.innerHTML = `<strong>Capital:</strong> ${country.capital?.[0] || 'No disponible'}`;
+card.appendChild(pCapital);
+
+
+const pRegion = document.createElement('p');
+pRegion.innerHTML = `<strong>Región:</strong> ${country.region}`;
+card.appendChild(pRegion);
+
+
+const pPoblacion = document.createElement('p');
+pPoblacion.innerHTML = `<strong>Población:</strong> ${country.population.toLocaleString()}`;
+card.appendChild(pPoblacion);
+
+
+const pIdiomas = document.createElement('p');
+pIdiomas.innerHTML = `<strong>Idiomas:</strong> ${Object.values(country.languages || {}).join(', ')}`;
+card.appendChild(pIdiomas);
+
+
+const img = document.createElement('img');
+img.src = country.flags.png;
+img.width = 150;
+img.className = "border rounded mb-2";
+card.appendChild(img);
+
+const divMapa = document.createElement('div');
+divMapa.id = "map";
+divMapa.style.height = "300px";
+divMapa.style.borderRadius = "8px";
+card.appendChild(divMapa);
+
+
+panelPais.appendChild(card);
 
       resultado.appendChild(panelPais);
 
@@ -289,4 +322,5 @@ autor: Mozilla Developer Network
   </script>
 </body>
 </html>
+
 
