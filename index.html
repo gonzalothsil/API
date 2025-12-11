@@ -145,19 +145,50 @@
           data.forEach(pais => {
 
             const div = document.createElement('div');
-            div.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3');
+div.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3');
 
-            div.innerHTML = `
-              <div class="country-card h-100">
-                <img src="${pais.flags.png}" class="country-flag">
-                <div class="country-info">
-                  <div class="country-name">${pais.name.common}</div>
-                  <div class="country-detail"><strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}</div>
-                  <div class="country-detail"><strong>Población:</strong> ${pais.population.toLocaleString()}</div>
-                  <div class="country-detail"><strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}</div>
-                </div>
-              </div>
-            `;
+const card = document.createElement('div');
+card.className = "country-card h-100";
+
+// --- Imagen de la bandera ---
+const img = document.createElement('img');
+img.src = pais.flags.png;
+img.className = "country-flag";
+card.appendChild(img);
+
+// --- Contenedor de info ---
+const info = document.createElement('div');
+info.className = "country-info";
+
+// Nombre
+const nameDiv = document.createElement('div');
+nameDiv.className = "country-name";
+nameDiv.textContent = pais.name.common;
+info.appendChild(nameDiv);
+
+// Capital
+const capDiv = document.createElement('div');
+capDiv.className = "country-detail";
+capDiv.innerHTML = `<strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}`;
+info.appendChild(capDiv);
+
+// Población
+const pobDiv = document.createElement('div');
+pobDiv.className = "country-detail";
+pobDiv.innerHTML = `<strong>Población:</strong> ${pais.population.toLocaleString()}`;
+info.appendChild(pobDiv);
+
+// Idiomas
+const idiDiv = document.createElement('div');
+idiDiv.className = "country-detail";
+idiDiv.innerHTML = `<strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}`;
+info.appendChild(idiDiv);
+
+card.appendChild(info);
+div.appendChild(card);
+
+resultado.appendChild(div);
+
 
             resultado.appendChild(div);
           });
@@ -265,16 +296,35 @@ panelPais.appendChild(card);
         const res = await fetch(`https://restcountries.com/v3.1/alpha?codes=${codes}`);
         const vecinos = await res.json();
 
-        vecinos.forEach(p => {
-          contenedorLimitrofes.innerHTML += `
-            <div class="border-bottom pb-2 mb-2">
-              <h6 class="text-secondary">${p.name.common}</h6>
-              <p><strong>Capital:</strong> ${p.capital?.[0] || 'No disponible'}</p>
-              <p><strong>Población:</strong> ${p.population.toLocaleString()}</p>
-              <img src="${p.flags.png}" width="80" class="border rounded">
-            </div>
-          `;
-        });
+      vecinos.forEach(p => {
+
+  const divItem = document.createElement('div');
+  divItem.className = "border-bottom pb-2 mb-2";
+
+  const titulo = document.createElement('h6');
+  titulo.className = "text-secondary";
+  titulo.textContent = p.name.common;
+
+  const pCapital = document.createElement('p');
+  pCapital.innerHTML = `<strong>Capital:</strong> ${p.capital?.[0] || 'No disponible'}`;
+
+  const pPoblacion = document.createElement('p');
+  pPoblacion.innerHTML = `<strong>Población:</strong> ${p.population.toLocaleString()}`;
+
+  const imgFlag = document.createElement('img');
+  imgFlag.src = p.flags.png;
+  imgFlag.width = 80;
+  imgFlag.className = "border rounded";
+
+  // Agregar todo al contenedor
+  divItem.appendChild(titulo);
+  divItem.appendChild(pCapital);
+  divItem.appendChild(pPoblacion);
+  divItem.appendChild(imgFlag);
+
+  contenedorLimitrofes.appendChild(divItem);
+});
+
 
       } catch {
         contenedorLimitrofes.innerHTML += `<p>Error al cargar países limítrofes.</p>`;
@@ -322,5 +372,6 @@ autor: Mozilla Developer Network
   </script>
 </body>
 </html>
+
 
 
