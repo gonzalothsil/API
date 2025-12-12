@@ -70,12 +70,38 @@ paisCorrecto = paises[Math.random() * paises.length | 0];
 
     opciones.sort(() => Math.random() - 0.5);
 
-    options.innerHTML = opciones
-      .map(p =>
-        `<button class="btn btn-outline-primary btn-option" onclick="verificar('${p.name.common}')">${p.name.common}</button>`
-      )
-      .join('');
+ function nuevaPregunta() {
+
+  feedback.textContent = "";
+  nextBtn.style.display = "none";
+
+  paisCorrecto = paises[Math.random() * paises.length | 0];
+
+  capital.textContent = `¿De qué país es la capital "${paisCorrecto.capital[0]}"?`;
+
+  const opciones = [paisCorrecto];
+
+  while (opciones.length < 4) {
+    let p = paises[Math.random() * paises.length | 0];
+    if (!opciones.includes(p)) opciones.push(p);
   }
+
+  opciones.sort(() => Math.random() - 0.5);
+
+  options.replaceChildren();
+
+  opciones.forEach(p => {
+    const btn = document.createElement("button");
+    btn.classList.add("btn", "btn-outline-primary", "btn-option");
+    btn.textContent = p.name.common;
+
+    btn.addEventListener("click", () => verificar(p.name.common));
+
+    options.appendChild(btn);
+  });
+}
+
+  
 
   function verificar(sel) {
 
@@ -123,6 +149,7 @@ autor:José Yedro
 
 </body>
 </html>
+
 
 
 
