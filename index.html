@@ -114,7 +114,7 @@
 
       fetch(url)
         .then(res => {
-          // Si la API devuelve error 404 
+ 
           if (!res.ok) throw new Error("País no encontrado");
           return res.json();
         })
@@ -150,35 +150,35 @@ div.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3');
 const card = document.createElement('div');
 card.className = "country-card h-100";
 
-// --- Imagen de la bandera ---
+
 const img = document.createElement('img');
 img.src = pais.flags.png;
 img.className = "country-flag";
 card.appendChild(img);
 
-// --- Contenedor de info ---
+
 const info = document.createElement('div');
 info.className = "country-info";
 
-// Nombre
+
 const nameDiv = document.createElement('div');
 nameDiv.className = "country-name";
 nameDiv.textContent = pais.name.common;
 info.appendChild(nameDiv);
 
-// Capital
+
 const capDiv = document.createElement('div');
 capDiv.className = "country-detail";
 capDiv.innerHTML = `<strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}`;
 info.appendChild(capDiv);
 
-// Población
+
 const pobDiv = document.createElement('div');
 pobDiv.className = "country-detail";
 pobDiv.innerHTML = `<strong>Población:</strong> ${pais.population.toLocaleString()}`;
 info.appendChild(pobDiv);
 
-// Idiomas
+
 const idiDiv = document.createElement('div');
 idiDiv.className = "country-detail";
 idiDiv.innerHTML = `<strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}`;
@@ -372,6 +372,7 @@ autor: Mozilla Developer Network
   </script>
 </body>
 </html>
+
 
 
 
