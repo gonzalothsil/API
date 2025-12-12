@@ -144,192 +144,218 @@
 
           data.forEach(pais => {
 
-            const div = document.createElement('div');
+         const div = document.createElement('div');
 div.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3');
 
 const card = document.createElement('div');
 card.className = "country-card h-100";
-
 
 const img = document.createElement('img');
 img.src = pais.flags.png;
 img.className = "country-flag";
 card.appendChild(img);
 
-
 const info = document.createElement('div');
 info.className = "country-info";
-
 
 const nameDiv = document.createElement('div');
 nameDiv.className = "country-name";
 nameDiv.textContent = pais.name.common;
 info.appendChild(nameDiv);
 
-
 const capDiv = document.createElement('div');
 capDiv.className = "country-detail";
-capDiv.innerHTML = `<strong>Capital:</strong> ${pais.capital?.[0] || 'No disponible'}`;
+const strongCap = document.createElement("strong");
+strongCap.textContent = "Capital: ";
+capDiv.appendChild(strongCap);
+capDiv.appendChild(document.createTextNode(pais.capital?.[0] || 'No disponible'));
 info.appendChild(capDiv);
-
 
 const pobDiv = document.createElement('div');
 pobDiv.className = "country-detail";
-pobDiv.innerHTML = `<strong>Población:</strong> ${pais.population.toLocaleString()}`;
+const strongPob = document.createElement("strong");
+strongPob.textContent = "Población: ";
+pobDiv.appendChild(strongPob);
+pobDiv.appendChild(document.createTextNode(pais.population.toLocaleString()));
 info.appendChild(pobDiv);
-
 
 const idiDiv = document.createElement('div');
 idiDiv.className = "country-detail";
-idiDiv.innerHTML = `<strong>Idiomas:</strong> ${Object.values(pais.languages || {}).join(', ')}`;
+const strongIdi = document.createElement("strong");
+strongIdi.textContent = "Idiomas: ";
+idiDiv.appendChild(strongIdi);
+idiDiv.appendChild(
+  document.createTextNode(Object.values(pais.languages || {}).join(', '))
+);
 info.appendChild(idiDiv);
 
 card.appendChild(info);
 div.appendChild(card);
-
 resultado.appendChild(div);
 
 
-            resultado.appendChild(div);
-          });
-        })
-        .catch(err => {
-          resultado.innerHTML =
-            `<p class="text-danger fw-bold">Error: ${err.message}</p>`;
-        });
-    }
+async function mostrarPaisYLimitrofes(country) {
 
-    async function mostrarPaisYLimitrofes(country) {
-
-      const resultado = document.getElementById('resultado');
-      resultado.innerHTML = ''; 
+  const resultado = document.getElementById('resultado');
+  resultado.replaceChildren(); 
 
 
-      const panelPais = document.createElement('div');
-      panelPais.classList.add('col-12', 'col-lg-6');
+  const panelPais = document.createElement('div');
+  panelPais.classList.add('col-12', 'col-lg-6');
 
-    
-const card = document.createElement('div');
-card.className = "card p-4 shadow border-0 text-start h-100";
-
-
-const titulo = document.createElement('h4');
-titulo.className = "text-primary";
-titulo.textContent = country.name.common;
-card.appendChild(titulo);
-
-const pCapital = document.createElement('p');
-pCapital.innerHTML = `<strong>Capital:</strong> ${country.capital?.[0] || 'No disponible'}`;
-card.appendChild(pCapital);
+  const card = document.createElement('div');
+  card.className = "card p-4 shadow border-0 text-start h-100";
 
 
-const pRegion = document.createElement('p');
-pRegion.innerHTML = `<strong>Región:</strong> ${country.region}`;
-card.appendChild(pRegion);
+  const titulo = document.createElement('h4');
+  titulo.className = "text-primary";
+  titulo.textContent = country.name.common;
+  card.appendChild(titulo);
 
-
-const pPoblacion = document.createElement('p');
-pPoblacion.innerHTML = `<strong>Población:</strong> ${country.population.toLocaleString()}`;
-card.appendChild(pPoblacion);
-
-
-const pIdiomas = document.createElement('p');
-pIdiomas.innerHTML = `<strong>Idiomas:</strong> ${Object.values(country.languages || {}).join(', ')}`;
-card.appendChild(pIdiomas);
-
-
-const img = document.createElement('img');
-img.src = country.flags.png;
-img.width = 150;
-img.className = "border rounded mb-2";
-card.appendChild(img);
-
-const divMapa = document.createElement('div');
-divMapa.id = "map";
-divMapa.style.height = "300px";
-divMapa.style.borderRadius = "8px";
-card.appendChild(divMapa);
-
-
-panelPais.appendChild(card);
-
-      resultado.appendChild(panelPais);
-
-      const [lat, lon] = country.latlng;
-
-      if (L.DomUtil.get('map') != null) {
-        L.DomUtil.get('map')._leaflet_id = null;
-      }
-
-      const map = L.map('map').setView([lat, lon], 5);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-        .addTo(map);
-
-      L.marker([lat, lon])
-        .addTo(map)
-        .bindPopup(`<b>${country.name.common}</b><br>Capital: ${country.capital?.[0]}`)
-        .openPopup();
-
-      const panelLimitrofes = document.createElement('div');
-      panelLimitrofes.classList.add('col-12', 'col-lg-6');
-
-      panelLimitrofes.innerHTML = `
-        <div class="card p-4 shadow border-0 text-start h-100">
-          <h5 class="text-success">Países limítrofes</h5>
-        </div>
-      `;
-
-      resultado.appendChild(panelLimitrofes);
-
-      const contenedorLimitrofes = panelLimitrofes.querySelector('.card');
-
-      if (!country.borders || country.borders.length === 0) {
-        contenedorLimitrofes.innerHTML += `<p>No tiene países limítrofes.</p>`;
-        return;
-      }
-
-
-      const codes = country.borders.join(',');
-
-      try {
-        const res = await fetch(`https://restcountries.com/v3.1/alpha?codes=${codes}`);
-        const vecinos = await res.json();
-
-      vecinos.forEach(p => {
-
-  const divItem = document.createElement('div');
-  divItem.className = "border-bottom pb-2 mb-2";
-
-  const titulo = document.createElement('h6');
-  titulo.className = "text-secondary";
-  titulo.textContent = p.name.common;
 
   const pCapital = document.createElement('p');
-  pCapital.innerHTML = `<strong>Capital:</strong> ${p.capital?.[0] || 'No disponible'}`;
+  const strongCap = document.createElement('strong');
+  strongCap.textContent = "Capital: ";
+  pCapital.appendChild(strongCap);
+  pCapital.appendChild(document.createTextNode(country.capital?.[0] || "No disponible"));
+  card.appendChild(pCapital);
+
+  const pRegion = document.createElement('p');
+  const strongReg = document.createElement('strong');
+  strongReg.textContent = "Región: ";
+  pRegion.appendChild(strongReg);
+  pRegion.appendChild(document.createTextNode(country.region));
+  card.appendChild(pRegion);
 
   const pPoblacion = document.createElement('p');
-  pPoblacion.innerHTML = `<strong>Población:</strong> ${p.population.toLocaleString()}`;
+  const strongPob = document.createElement('strong');
+  strongPob.textContent = "Población: ";
+  pPoblacion.appendChild(strongPob);
+  pPoblacion.appendChild(document.createTextNode(country.population.toLocaleString()));
+  card.appendChild(pPoblacion);
 
-  const imgFlag = document.createElement('img');
-  imgFlag.src = p.flags.png;
-  imgFlag.width = 80;
-  imgFlag.className = "border rounded";
-
-  // Agregar todo al contenedor
-  divItem.appendChild(titulo);
-  divItem.appendChild(pCapital);
-  divItem.appendChild(pPoblacion);
-  divItem.appendChild(imgFlag);
-
-  contenedorLimitrofes.appendChild(divItem);
-});
+  const pIdiomas = document.createElement('p');
+  const strongIdi = document.createElement('strong');
+  strongIdi.textContent = "Idiomas: ";
+  pIdiomas.appendChild(strongIdi);
+  pIdiomas.appendChild(
+    document.createTextNode(Object.values(country.languages || {}).join(', '))
+  );
+  card.appendChild(pIdiomas);
 
 
-      } catch {
-        contenedorLimitrofes.innerHTML += `<p>Error al cargar países limítrofes.</p>`;
-      }
-    }
+  const img = document.createElement('img');
+  img.src = country.flags.png;
+  img.width = 150;
+  img.className = "border rounded mb-2";
+  card.appendChild(img);
+
+
+  const divMapa = document.createElement('div');
+  divMapa.id = "map";
+  divMapa.style.height = "300px";
+  divMapa.style.borderRadius = "8px";
+  card.appendChild(divMapa);
+
+  panelPais.appendChild(card);
+  resultado.appendChild(panelPais);
+
+
+  const [lat, lon] = country.latlng;
+
+  if (L.DomUtil.get('map') != null) {
+    L.DomUtil.get('map')._leaflet_id = null;
+  }
+
+  const map = L.map('map').setView([lat, lon], 5);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+    .addTo(map);
+
+  L.marker([lat, lon])
+    .addTo(map)
+    .bindPopup(`${country.name.common}\nCapital: ${country.capital?.[0] || "No disponible"}`)
+    .openPopup();
+
+
+  const panelLimitrofes = document.createElement('div');
+  panelLimitrofes.classList.add('col-12', 'col-lg-6');
+
+  const cardLim = document.createElement('div');
+  cardLim.className = "card p-4 shadow border-0 text-start h-100";
+
+  const h5 = document.createElement('h5');
+  h5.className = "text-success";
+  h5.textContent = "Países limítrofes";
+
+  cardLim.appendChild(h5);
+  panelLimitrofes.appendChild(cardLim);
+  resultado.appendChild(panelLimitrofes);
+
+
+  const contenedorLimitrofes = cardLim;
+
+
+  if (!country.borders || country.borders.length === 0) {
+    const noHay = document.createElement('p');
+    noHay.textContent = "No tiene países limítrofes.";
+    contenedorLimitrofes.appendChild(noHay);
+    return;
+  }
+
+
+  const codes = country.borders.join(',');
+
+  try {
+    const res = await fetch(`https://restcountries.com/v3.1/alpha?codes=${codes}`);
+    const vecinos = await res.json();
+
+    vecinos.forEach(p => {
+
+      const divItem = document.createElement('div');
+      divItem.className = "border-bottom pb-2 mb-2";
+
+      const titulo = document.createElement('h6');
+      titulo.className = "text-secondary";
+      titulo.textContent = p.name.common;
+
+      
+      const pc = document.createElement('p');
+      const stc = document.createElement('strong');
+      stc.textContent = "Capital: ";
+      pc.appendChild(stc);
+      pc.appendChild(document.createTextNode(p.capital?.[0] || "No disponible"));
+
+      
+      const pp = document.createElement('p');
+      const stp = document.createElement('strong');
+      stp.textContent = "Población: ";
+      pp.appendChild(stp);
+      pp.appendChild(document.createTextNode(p.population.toLocaleString()));
+
+      
+      const imgFlag = document.createElement('img');
+      imgFlag.src = p.flags.png;
+      imgFlag.width = 80;
+      imgFlag.className = "border rounded";
+
+      divItem.appendChild(titulo);
+      divItem.appendChild(pc);
+      divItem.appendChild(pp);
+      divItem.appendChild(imgFlag);
+
+      contenedorLimitrofes.appendChild(divItem);
+
+    });
+
+  } catch {
+
+    const pErr = document.createElement('p');
+    pErr.textContent = "Error al cargar países limítrofes.";
+    contenedorLimitrofes.appendChild(pErr);
+
+  }
+}
 
     document.getElementById('paisInput')
       .addEventListener('keydown', e => {
@@ -372,6 +398,7 @@ autor: Mozilla Developer Network
   </script>
 </body>
 </html>
+
 
 
 
