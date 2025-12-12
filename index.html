@@ -62,6 +62,7 @@
       font-size: 0.9rem;
       color: #333;
     }
+
   </style>
 </head>
 
@@ -138,60 +139,66 @@
       
       fetch(`https://restcountries.com/v3.1/region/${region}`)
         .then(res => res.json())
-        .then(data => {
+          .then(data => {
           
           resultado.innerHTML = '';
 
           data.forEach(pais => {
 
-         const div = document.createElement('div');
-div.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3');
+            const div = document.createElement('div');
+            div.classList.add('col-12', 'col-sm-6', 'col-md-4', 'col-lg-3');
 
-const card = document.createElement('div');
-card.className = "country-card h-100";
+            const card = document.createElement('div');
+            card.className = "country-card h-100";
 
-const img = document.createElement('img');
-img.src = pais.flags.png;
-img.className = "country-flag";
-card.appendChild(img);
+            const img = document.createElement('img');
+            img.src = pais.flags.png;
+            img.className = "country-flag";
+            card.appendChild(img);
 
-const info = document.createElement('div');
-info.className = "country-info";
+            const info = document.createElement('div');
+            info.className = "country-info";
 
-const nameDiv = document.createElement('div');
-nameDiv.className = "country-name";
-nameDiv.textContent = pais.name.common;
-info.appendChild(nameDiv);
+            const nameDiv = document.createElement('div');
+            nameDiv.className = "country-name";
+            nameDiv.textContent = pais.name.common;
+            info.appendChild(nameDiv);
 
-const capDiv = document.createElement('div');
-capDiv.className = "country-detail";
-const strongCap = document.createElement("strong");
-strongCap.textContent = "Capital: ";
-capDiv.appendChild(strongCap);
-capDiv.appendChild(document.createTextNode(pais.capital?.[0] || 'No disponible'));
-info.appendChild(capDiv);
+            const capDiv = document.createElement('div');
+            capDiv.className = "country-detail";
+            const strongCap = document.createElement("strong");
+            strongCap.textContent = "Capital: ";
+            capDiv.appendChild(strongCap);
+            capDiv.appendChild(document.createTextNode(pais.capital?.[0] || 'No disponible'));
+            info.appendChild(capDiv);
 
-const pobDiv = document.createElement('div');
-pobDiv.className = "country-detail";
-const strongPob = document.createElement("strong");
-strongPob.textContent = "Población: ";
-pobDiv.appendChild(strongPob);
-pobDiv.appendChild(document.createTextNode(pais.population.toLocaleString()));
-info.appendChild(pobDiv);
+            const pobDiv = document.createElement('div');
+            pobDiv.className = "country-detail";
+            const strongPob = document.createElement("strong");
+            strongPob.textContent = "Población: ";
+            pobDiv.appendChild(strongPob);
+            pobDiv.appendChild(document.createTextNode(pais.population.toLocaleString()));
+            info.appendChild(pobDiv);
 
-const idiDiv = document.createElement('div');
-idiDiv.className = "country-detail";
-const strongIdi = document.createElement("strong");
-strongIdi.textContent = "Idiomas: ";
-idiDiv.appendChild(strongIdi);
-idiDiv.appendChild(
-  document.createTextNode(Object.values(pais.languages || {}).join(', '))
-);
-info.appendChild(idiDiv);
+            const idiDiv = document.createElement('div');
+            idiDiv.className = "country-detail";
+            const strongIdi = document.createElement("strong");
+            strongIdi.textContent = "Idiomas: ";
+            idiDiv.appendChild(strongIdi);
+            idiDiv.appendChild(
+              document.createTextNode(Object.values(pais.languages || {}).join(', '))
+            );
+            info.appendChild(idiDiv);
 
-card.appendChild(info);
-div.appendChild(card);
-resultado.appendChild(div);
+            card.appendChild(info);
+            div.appendChild(card);
+            resultado.appendChild(div);
+
+          });   // ← ESTE ) FALTABA
+
+        })       // ← ESTE TAMBIÉN FALTABA
+    }  // ← ESTA LLAVE FALTABA PARA CERRAR buscarPorRegion()
+
 
 
 async function mostrarPaisYLimitrofes(country) {
@@ -398,8 +405,3 @@ autor: Mozilla Developer Network
   </script>
 </body>
 </html>
-
-
-
-
-
