@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -111,7 +111,13 @@
 
       const resultado = document.getElementById('resultado');
 
-      resultado.innerHTML = '<div class="loader"></div>';
+
+resultado.textContent = '';
+
+const loader = document.createElement('div');
+loader.classList.add('loader');
+
+resultado.appendChild(loader);
 
       fetch(url)
         .then(res => {
@@ -123,8 +129,14 @@
           mostrarPaisYLimitrofes(data[0]);
         })
         .catch(error => {
-          resultado.innerHTML =
-            `<p class="text-danger fw-bold">Error: ${error.message}</p>`;
+   resultado.replaceChildren();
+
+const p = document.createElement('p');
+p.className = 'text-danger fw-bold';
+p.textContent = `Error: ${error.message}`;
+
+resultado.appendChild(p);
+
         });
     }
 
@@ -135,13 +147,18 @@
 
       if (!region) return;
 
-      resultado.innerHTML = '<div class="loader"></div>';
+      resultado.replaceChildren();
+
+const loader = document.createElement('div');
+loader.classList.add('loader');
+resultado.appendChild(loader);
+
       
       fetch(`https://restcountries.com/v3.1/region/${region}`)
         .then(res => res.json())
           .then(data => {
           
-          resultado.innerHTML = '';
+         resultado.replaceChildren();
 
           data.forEach(pais => {
 
@@ -405,4 +422,3 @@ autor: Mozilla Developer Network
   </script>
 </body>
 </html>
-
